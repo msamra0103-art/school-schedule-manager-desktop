@@ -1,0 +1,88 @@
+name: Build Windows Setup
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "desktop-v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: إنشاء واختبار ملف التثبيت
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: تنزيل ملفات المشروع
+        uses: actions/checkout@v4
+
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: تثبيت الاعتماديات
+        run: npm ci
+
+      - name: فحص ملفات المشروع
+        shell: bash
+        run: npm test
+
+      - name: إنشاء Setup لويندوز
+        run: npm run desktop:dist
+
+      - name: اختبار فتح النسخة التنفيذية
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem "dist-desktop\win-unpacked\*.exe" |
+            Where-Object { $_.Name -notmatch "Uninstall|elevate" } |
+            Select-Object -First 1
+
+          if (-not $exe) {
+            throw "لم يتم العثور على ملف البرنامج التنفيذي."
+          }
+
+          $process = Start-Process -FilePath $exe.FullName -PassThru
+          Start-Sleep -Seconds 12
+
+          if ($process.HasExited) {
+            throw "أُغلق البرنامج أثناء اختبار التشغيل."
+          }
+
+          Stop-Process -Id $process.Id -Force
+          Write-Host "نجح اختبار تشغيل البرنامج."
+
+      - name: التحقق من ملف Setup
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem "dist-desktop\School-Schedule-Manager-Setup-*-x64.exe" |
+            Select-Object -First 1
+
+          if (-not $setup) {
+            throw "ملف Setup غير موجود."
+          }
+
+          Get-FileHash $setup.FullName -Algorithm SHA256
+
+      - name: رفع ملف التثبيت
+        uses: actions/upload-artifact@v4
+        with:
+          name: School-Schedule-Manager-Windows-Setup
+          path: |
+            dist-desktop/School-Schedule-Manager-Setup-*-x64.exe
+            dist-desktop/latest.yml
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: إرفاق Setup بإصدار GitHub
+        if: startsWith(github.ref, 'refs/tags/desktop-v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-desktop/School-Schedule-Manager-Setup-*-x64.exe
+            dist-desktop/latest.yml
+          generate_release_notes: true
