@@ -28,9 +28,9 @@ jobs:
       - name: تثبيت الاعتماديات
         run: npm ci
 
-      - name: فحص ملفات المشروع
+            - name: فحص ملفات المشروع
         shell: bash
-        run: npm test
+        run: node scripts/test-schedule-data.mjs && node scripts/test-requirements.mjs && node scripts/test-desktop.mjs
 
       - name: إنشاء Setup لويندوز
         run: npm run desktop:dist
