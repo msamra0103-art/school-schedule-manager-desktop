@@ -33,7 +33,7 @@ jobs:
         run: node scripts/test-schedule-data.mjs && node scripts/test-requirements.mjs && node scripts/test-desktop.mjs
 
       - name: إنشاء Setup لويندوز
-        run: npm run desktop:dist
+        run: npx electron-builder --win nsis --x64 --publish never
 
       - name: اختبار فتح النسخة التنفيذية
         shell: pwsh
