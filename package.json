@@ -1,0 +1,63 @@
+{
+  "name": "school-schedule-manager-desktop",
+  "version": "1.1.0",
+  "description": "لوحة إدارة الجدول المدرسي — نسخة الويب وسطح المكتب",
+  "author": "School Schedule Manager Team",
+  "private": true,
+  "type": "module",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "build": "bash scripts/build.sh",
+    "web:build": "node scripts/build-web.mjs",
+    "validate": "node scripts/validate-artifact.mjs",
+    "test": "npm run build && node scripts/test-schedule-data.mjs && node scripts/test-requirements.mjs && node scripts/test-worker.mjs && node scripts/test-desktop.mjs && npm run validate",
+    "desktop:start": "electron .",
+    "desktop:dist": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "35.7.5",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "qa.edu.abuubaida.school.schedule",
+    "productName": "لوحة إدارة الجدول المدرسي",
+    "artifactName": "School-Schedule-Manager-Setup-${version}-x64.${ext}",
+    "asar": true,
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "desktop/main.cjs",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "site",
+        "to": "site"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "لوحة إدارة الجدول المدرسي",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2"
+  }
+}

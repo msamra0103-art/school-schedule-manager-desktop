@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123e6b">
+  <title>لوحة إدارة الجدول المدرسي</title>
+  <meta name="description" content="لوحة عربية متكاملة لإدارة الجدول المدرسي ومنع التعارضات وإصدار جداول المعلّمين والفصول.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-loading" id="appLoading"><div class="loading-card"><span class="loading-logo">ج</span><h1>لوحة إدارة الجدول المدرسي</h1><p id="loadingMessage">جارٍ التحقق من الحساب وتحميل أحدث نسخة من الجدول…</p></div></div>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-emblem"><img src="assets/ministry-logo.png" alt="شعار وزارة التربية والتعليم والتعليم العالي"></div>
+        <div class="brand-copy"><strong>لوحة إدارة الجدول المدرسي</strong><small id="sidebarSchoolName">اسم المدرسة</small></div>
+      </div>
+      <nav aria-label="التنقل الرئيسي">
+        <button class="nav-btn active" data-view="dashboard"><span>▦</span> لوحة المتابعة</button>
+        <button class="nav-btn" data-view="data"><span>≡</span> البيانات الأساسية</button>
+        <button class="nav-btn" data-view="builder"><span>▦</span> بناء الجدول</button>
+        <button class="nav-btn" data-view="substitutions"><span>⇄</span> الغياب والاستئذان</button>
+        <button class="nav-btn" data-view="rules"><span>✓</span> القواعد والحجوزات</button>
+        <button class="nav-btn" data-view="views"><span>▤</span> جداول منفصلة</button>
+        <button class="nav-btn" data-view="reports"><span>◫</span> التقارير والفحص</button>
+        <button class="nav-btn" data-view="archive"><span>◷</span> النسخ والأرشيف</button>
+        <button class="nav-btn" data-view="settings"><span>⚙</span> الإعدادات والتوقيت</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="account-chip" id="accountChip"><strong>الحساب</strong><small>جارٍ التحميل…</small></div>
+        <div class="save-state"><i></i><span id="saveState">محفوظ تلقائيًّا</span></div>
+        <button class="ghost-btn full" id="backupBtn">تنزيل نسخة احتياطية</button>
+        <button class="ghost-btn full sidebar-logout" id="logoutBtn">تسجيل الخروج</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn mobile-only" id="menuBtn" aria-label="فتح القائمة">☰</button>
+        <div class="school-title">
+          <div class="mini-logo" id="headerLogo">م</div>
+          <div><strong id="headerSchoolName">مدرستي</strong><small id="headerTerm">الفصل الدراسي الأول</small></div>
+        </div>
+        <div class="top-actions">
+          <button class="ghost-btn" id="undoBtn" title="تراجع">↶ <span>تراجع</span></button>
+          <button class="ghost-btn" id="redoBtn" title="إعادة">↷ <span>إعادة</span></button>
+          <button class="primary-btn" id="quickGenerateBtn">إنشاء الجدول تلقائيًّا</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="view active" id="view-dashboard">
+          <div class="page-heading">
+            <div><p class="eyebrow">نظرة عامة</p><h1>لوحة إدارة الجدول المدرسي</h1><p>بيانات الجدول الفعلي جاهزة للمراجعة والتحريك والطباعة.</p></div>
+            <div class="heading-actions"><button class="ghost-btn" data-go="settings">ضبط أوقات الحصص</button><button class="primary-btn" data-go="builder">فتح الجدول المجمّع</button></div>
+          </div>
+          <article class="import-banner" id="importBanner">
+            <div class="import-mark">✓</div>
+            <div><strong id="importBannerTitle">بيانات الجدول جاهزة</strong><p id="importSummary">جارٍ تجهيز ملخص البيانات…</p></div>
+            <span class="source-badge" id="sourceBadge">بيانات محفوظة</span>
+          </article>
+          <article class="excel-import-card">
+            <div class="excel-import-icon">X</div>
+            <div>
+              <strong>ابدأ جدولًا جديدًا من ملف Excel</strong>
+              <p>استورد جميع البيانات الأساسية، افحصها قبل الاعتماد، ثم أنشئ الجدول تلقائيًّا دون تعارض.</p>
+            </div>
+            <div class="excel-import-actions">
+              <a class="ghost-btn" href="assets/نموذج-البيانات-الأساسية-المعتمد.xlsx" download>تنزيل النموذج المعتمد</a>
+              <button class="primary-btn" id="openExcelImportBtn">استيراد البيانات الأساسية من Excel</button>
+            </div>
+          </article>
+          <div class="quick-grid" aria-label="اختصارات العمل">
+            <button data-go="data"><span>١</span><strong>راجع البيانات</strong><small>المعلّمون والفصول والمواد</small></button>
+            <button data-go="builder"><span>٢</span><strong>حرّك الحصص</strong><small>مع منع التعارض تلقائيًّا</small></button>
+            <button data-go="views"><span>٣</span><strong>استخرج الجداول</strong><small>لكل معلّم أو فصل</small></button>
+            <button data-go="reports"><span>٤</span><strong>افحص واعتمد</strong><small>التعارضات والأنصبة</small></button>
+          </div>
+          <div class="stats-grid" id="statsGrid"></div>
+          <div class="dashboard-grid">
+            <article class="panel health-panel">
+              <div class="panel-head"><div><h2>سلامة الجدول</h2><p>فحص التعارضات والحصص الناقصة</p></div><div class="score-ring" id="scoreRing"><strong id="qualityScore">0</strong><small>%</small></div></div>
+              <div id="healthList" class="health-list"></div>
+            </article>
+            <article class="panel progress-panel">
+              <div class="panel-head"><div><h2>تقدّم الإعداد</h2><p>الخطوات المطلوبة للوصول إلى جدول مكتمل</p></div></div>
+              <div id="setupProgress"></div>
+            </article>
+          </div>
+          <article class="panel today-panel">
+            <div class="panel-head"><div><h2>ملخّص التوزيع الأسبوعي</h2><p>عدد الحصص الموزعة في كل يوم</p></div><button class="text-btn" data-go="reports">عرض التفاصيل</button></div>
+            <div class="day-bars" id="dayBars"></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-data">
+          <div class="page-heading">
+            <div><p class="eyebrow">قاعدة البيانات</p><h1>البيانات الأساسية</h1><p>أضف عناصر المدرسة ثم اربط المعلّمين بالفصول والمواد.</p></div>
+            <div class="heading-actions"><button class="ghost-btn accent-btn" id="openExcelImportDataBtn">استيراد Excel</button><button class="primary-btn" id="contextAddBtn">+ إضافة معلّم</button></div>
+          </div>
+          <div class="tabs" role="tablist" id="dataTabs">
+            <button class="tab active" data-tab="teachers">المعلّمون <b id="teachersCount">0</b></button>
+            <button class="tab" data-tab="classes">الفصول <b id="classesCount">0</b></button>
+            <button class="tab" data-tab="subjects">المواد <b id="subjectsCount">0</b></button>
+            <button class="tab" data-tab="assignments">التكليفات <b id="assignmentsCount">0</b></button>
+            <button class="tab" data-tab="rooms">الغرف <b id="roomsCount">0</b></button>
+          </div>
+          <article class="panel data-panel">
+            <div class="table-tools">
+              <label class="search-box"><span>⌕</span><input id="dataSearch" type="search" placeholder="ابحث في القائمة..."></label>
+              <div><button class="ghost-btn" id="downloadTemplateBtn">تنزيل نموذج CSV</button><label class="ghost-btn file-label">استيراد CSV<input type="file" id="csvInput" accept=".csv,text/csv"></label></div>
+            </div>
+            <div class="table-wrap"><table class="data-table"><thead id="dataHead"></thead><tbody id="dataBody"></tbody></table></div>
+            <div id="dataEmpty" class="empty-state" hidden><div>＋</div><h3>لا توجد بيانات بعد</h3><p>ابدأ بإضافة أول عنصر أو استيراد ملف CSV.</p></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-builder">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">مساحة العمل</p><h1>الجدول المجمّع</h1><p>اسحب الحصة إلى الموضع المطلوب؛ سيعيد النظام ترتيب الحصص المتأثرة تلقائيًّا لمنع التعارض.</p></div>
+            <div class="heading-actions">
+              <button class="ghost-btn" id="validateBtn">فحص الجدول</button>
+              <button class="ghost-btn" id="autoFixBtn">إكمال النواقص</button>
+              <button class="ghost-btn accent-btn" id="suggestSwapBtn">مقترح التبديل الذكي</button>
+              <button class="primary-btn" id="generateBtn">إعادة الإنشاء</button>
+            </div>
+          </div>
+          <div class="builder-toolbar panel">
+            <label>عرض القسم<select id="departmentFilter"><option value="">جميع الأقسام</option></select></label>
+            <label>التكبير<input id="zoomRange" type="range" min="55" max="110" value="78"><output id="zoomOutput">78%</output></label>
+            <div class="legend"><span><i class="dot locked"></i> حصة مقفلة</span><span><i class="dot department"></i> اجتماع قسم</span><span><i class="dot external"></i> تطوير مهني خارجي</span><span><i class="dot unavailable"></i> غير متاح</span></div>
+            <div class="toolbar-end"><button class="ghost-btn" id="printMasterBtn">طباعة / PDF</button><button class="ghost-btn" id="pngMasterBtn">تنزيل صورة</button><button class="ghost-btn" id="excelMasterBtn">Excel</button></div>
+          </div>
+          <div class="notice" id="builderNotice" hidden></div>
+          <div class="master-shell panel"><div class="master-scroll" id="masterScroll"><div id="masterSchedule"></div></div></div>
+          <article class="panel change-report-panel" id="changeReportPanel" hidden>
+            <div class="panel-head"><div><h2>ملخص آخر تغيير</h2><p>كل الحصص التي تحركت مباشرة أو تلقائيًا لمنع التعارض.</p></div><div class="heading-actions"><button class="ghost-btn" id="openChangeReportBtn">عرض كامل</button><button class="ghost-btn" id="printChangeReportBtn">طباعة التقرير</button></div></div>
+            <div id="changeReportSummary"></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-substitutions">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">التغطية اليومية</p><h1>الغياب والاستئذان والتبديلات</h1><p>حدِّد الحالة والحصص، وسيقترح النظام تغطية عادلة أو تبديلًا متبادلًا داخل اليوم أو بين الأيام.</p></div>
+            <div class="heading-actions"><button class="ghost-btn" id="printSubstitutionsBtn">طباعة كشف اليوم</button><button class="primary-btn" id="saveSubstitutionsBtn">اعتماد التبديلات</button></div>
+          </div>
+          <div class="substitution-layout">
+            <article class="panel substitution-form">
+              <div class="panel-head"><div><h2>بيانات الغياب</h2><p>التعديل خاص بهذا التاريخ ولا يغيّر الجدول الأساسي</p></div></div>
+              <div class="sub-fields">
+                <label>التاريخ<input id="subDate" type="date"></label>
+                <label>اليوم<select id="subDay"></select></label>
+                <label>نوع الحالة<select id="absenceType"><option value="absence">غياب يومي</option><option value="permission">استئذان جزئي وتبديل متبادل</option></select></label>
+                <label>نطاق التبديل<select id="subSwapScope"><option value="same_then_other">اليوم نفسه ثم بقية الأيام</option><option value="same">اليوم نفسه فقط</option><option value="all">جميع أيام الأسبوع</option></select></label>
+                <label class="span-2">المعلّم الغائب أو المستأذن<select id="absentTeacher"></select></label>
+                <label class="span-2">ملاحظة<input id="subNote" type="text" placeholder="غياب، استئذان، مهمة رسمية..."></label>
+              </div>
+              <div class="period-picks" id="absencePeriods"></div>
+              <button class="primary-btn full-action" id="findSubstitutesBtn">عرض البدلاء المتاحين</button>
+            </article>
+            <article class="panel substitution-results">
+              <div class="panel-head"><div><h2>التغطية المقترحة</h2><p>المرشحون مرتّبون حسب توافق المادة وقلة النصاب اليومي</p></div></div>
+              <div id="substitutionResults" class="substitution-list"><div class="empty-state"><div>⇄</div><h3>اختر بيانات الغياب</h3><p>ثم اضغط «عرض البدلاء المتاحين».</p></div></div>
+            </article>
+          </div>
+          <article class="panel saved-substitutions">
+            <div class="panel-head"><div><h2>السجل اليومي</h2><p>التبديلات المحفوظة والقابلة للطباعة</p></div></div>
+            <div id="savedSubstitutions"></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-rules">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">ضبط التوزيع</p><h1>القواعد والحجوزات</h1><p>احجز وقت قسم كامل أو فعّل قواعد التوزيع، ثم دع النظام يعيد ترتيب حصص المعلّمين أنفسهم دون تعارض.</p></div>
+            <button class="primary-btn" id="applyRulesBtn">تطبيق القواعد الآن</button>
+          </div>
+          <div class="rules-layout">
+            <article class="panel reservation-panel">
+              <div class="panel-head"><div><h2>حجز قسم كامل</h2><p>يبقى نصاب كل معلّم كاملًا وينتقل خارج الوقت المحجوز.</p></div></div>
+              <div class="reservation-form">
+                <label>القسم<select id="reservationDepartment"></select></label>
+                <label>اليوم<select id="reservationDay"></select></label>
+                <label>نوع الحجز<select id="reservationMode"><option value="weekly">أسبوعي ثابت</option><option value="date">لتاريخ محدد</option></select></label>
+                <label>تاريخ الحجز<input id="reservationDate" type="date"></label>
+                <label class="span-2">سبب الحجز<input id="reservationReason" placeholder="اجتماع قسم، تطوير مهني، نشاط..."></label>
+                <label>لون الحجز<input id="reservationColor" type="color" value="#f47a2a"></label>
+                <div class="span-2 reservation-periods"><strong>الحصص المحجوزة</strong><div id="reservationPeriods"></div></div>
+                <button class="primary-btn span-2" id="saveReservationBtn" type="button">حفظ الحجز وتفريغ القسم</button>
+              </div>
+              <div id="reservationList" class="reservation-list"></div>
+            </article>
+            <article class="panel rules-panel">
+              <div class="panel-head"><div><h2>محرك القواعد المرن</h2><p>فعّل القاعدة أو أوقفها؛ تُحفظ فورًا وتُطبّق تلقائيًا متى أمكن.</p></div></div>
+              <div id="rulesStatus" class="rules-status" aria-live="polite"></div>
+              <div id="rulesList" class="rules-list"></div>
+              <div class="rule-builder">
+                <h3>إضافة قاعدة جديدة</h3>
+                <div class="rule-builder-grid">
+                  <label>اسم القاعدة<input id="ruleName" placeholder="مثال: حد الحصص المتتالية"></label>
+                  <label>نوع القاعدة<select id="ruleType"><option value="max_consecutive">أقصى حصص متتالية</option><option value="max_daily">أقصى حصص في اليوم</option><option value="no_first">منع الحصة الأولى</option><option value="no_last">منع الحصة الأخيرة</option><option value="blocked_period">منع حصة محددة</option><option value="double_contiguous">الحصص المزدوجة متتالية دون فسحة</option></select></label>
+                  <label>نطاق التطبيق<select id="ruleScope"><option value="all">الجميع</option><option value="department">قسم</option><option value="teacher">معلّم</option><option value="subject">مادة</option><option value="class">فصل</option></select></label>
+                  <label>المستهدف<select id="ruleTarget"><option value="">الجميع</option></select></label>
+                  <label>القيمة<input id="ruleValue" type="number" min="1" max="7" value="3"></label>
+                  <button class="primary-btn" id="addRuleBtn" type="button">إضافة وتفعيل</button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-views">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">الجداول الفرعية</p><h1>جداول المعلّمين والفصول</h1><p>استعرض أي جدول وصدّره منفردًا أو صدّر المجموعة كاملة.</p></div>
+          </div>
+          <div class="view-controls panel">
+            <div class="segmented" id="viewModeSwitch"><button class="active" data-mode="teacher">جدول معلّم</button><button data-mode="class">جدول فصل</button></div>
+            <label class="grow"><span id="entitySelectLabel">اختر المعلّم</span><select id="entitySelect"></select></label>
+            <label><span>نظام التوقيت</span><select id="profilePreview"></select></label>
+            <button class="ghost-btn" id="printSingleBtn">طباعة / PDF</button>
+            <button class="primary-btn" id="pngSingleBtn">تنزيل صورة</button>
+            <button class="ghost-btn" id="pngAllBtn">صور الجميع</button>
+          </div>
+          <div id="singleSchedule" class="single-wrap panel"></div>
+        </section>
+
+        <section class="view" id="view-reports">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">التدقيق</p><h1>التقارير والفحص</h1><p>اكشف التعارضات والنواقص وفراغات المعلّمين قبل الاعتماد.</p></div>
+            <button class="primary-btn" id="runAuditBtn">تشغيل الفحص الشامل</button>
+          </div>
+          <div class="report-cards" id="reportCards"></div>
+          <article class="panel report-actions-panel"><div><strong>تقارير جاهزة</strong><small>اطبع أو صدّر البيانات بالطريقة المناسبة.</small></div><div><button class="ghost-btn" id="teacherReportBtn">تقرير المعلّمين</button><button class="ghost-btn" id="classReportBtn">تقرير الفصول</button><button class="ghost-btn" id="subjectReportBtn">تقرير المواد</button><button class="ghost-btn" id="masterTotalsReportBtn">إجماليات الجدول</button></div></article>
+          <div class="report-grid">
+            <article class="panel"><div class="panel-head"><div><h2>المشكلات والتنبيهات</h2><p>اضغط على المشكلة للانتقال إلى موضعها</p></div></div><div id="issuesList" class="issues-list"></div></article>
+            <article class="panel"><div class="panel-head"><div><h2>الأنصبة الأسبوعية</h2><p>مقارنة نصاب المعلّم بالحِصص الموزعة</p></div><button class="text-btn" id="exportWorkloadBtn">تصدير Excel</button></div><div class="table-wrap compact-table"><table class="data-table"><thead><tr><th>المعلّم</th><th>القسم</th><th>المطلوب</th><th>الموزع</th><th>الفرق</th></tr></thead><tbody id="workloadBody"></tbody></table></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-archive">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">الحماية والاسترجاع</p><h1>النسخ الاحتياطية وأرشيف الجدول</h1><p>احفظ المشروع كاملًا، أو ارجع إلى نسخة مؤرخة دون فقد النسخة الحالية.</p></div>
+            <div class="heading-actions"><button class="primary-btn" id="archiveExportBtn">تنزيل نسخة احتياطية</button><label class="ghost-btn file-label">استيراد نسخة<input id="archiveBackupInput" type="file" accept="application/json,.json"></label></div>
+          </div>
+          <article class="panel backup-overview">
+            <div><strong>النسخة الاحتياطية الشاملة</strong><p>تتضمن البيانات والجداول والقواعد والحجوزات والتبديلات والأرشيف والإعدادات.</p></div>
+            <div id="backupOverviewStats"></div>
+          </article>
+          <article class="panel archive-panel">
+            <div class="panel-head"><div><h2>أرشيف نسخ الجدول</h2><p>يُحفظ تلقائيًا قبل التغييرات المهمة، ويمكنك إضافة نسخة مسماة يدويًا.</p></div><div class="archive-create"><input id="archiveName" placeholder="اسم النسخة، مثل: النسخة المعتمدة"><button class="primary-btn" id="createArchiveBtn">حفظ نسخة الآن</button></div></div>
+            <div id="archiveList" class="archive-list"></div>
+          </article>
+        </section>
+
+        <section class="view" id="view-settings">
+          <div class="page-heading compact">
+            <div><p class="eyebrow">إعداد المدرسة</p><h1>الإعدادات والتوقيت</h1><p>اضبط معلومات المدرسة وأيام الدوام ونظامَي الحصص والفسحة.</p></div>
+            <button class="primary-btn" id="saveSettingsBtn">حفظ الإعدادات</button>
+          </div>
+          <div class="settings-grid">
+            <article class="panel form-panel">
+              <div class="panel-head"><div><h2>بيانات المدرسة</h2><p>تظهر في رأس الجداول المطبوعة</p></div></div>
+              <div class="form-grid">
+                <label class="span-2">اسم المدرسة<input id="schoolNameInput" type="text"></label>
+                <label>العام الدراسي<input id="academicYearInput" type="text"></label>
+                <label>الفصل الدراسي<input id="termInput" type="text"></label>
+                <label>تاريخ إصدار الجدول<input id="issueDateInput" type="date"></label>
+                <label>اسم مختصر للبرنامج<input value="لوحة إدارة الجدول المدرسي" disabled></label>
+                <label class="span-2">الشعار<input id="logoInput" type="file" accept="image/*"><small>PNG أو JPG، ويُحفظ مع بيانات المشروع ويظهر في المخرجات.</small></label>
+              </div>
+            </article>
+            <article class="panel form-panel">
+              <div class="panel-head"><div><h2>أيام الدوام</h2><p>اختر الأيام التي ستظهر في الجدول</p></div></div>
+              <div id="daysSettings" class="check-grid"></div>
+              <hr>
+              <label class="switch-row"><span><strong>منع الحصة الأولى بعد حصة أخيرة</strong><small>قاعدة تفضيلية لتخفيف ضغط المعلّمين</small></span><input id="avoidLateEarly" type="checkbox"></label>
+              <label class="switch-row"><span><strong>السماح بتجاوز القواعد التفضيلية</strong><small>لا يؤثر في قواعد التعارض الإلزامية</small></span><input id="allowSoftBreak" type="checkbox"></label>
+            </article>
+          </div>
+          <article class="panel timing-panel">
+            <div class="panel-head"><div><h2>أنظمة التوقيت والفسح</h2><p>أنشئ توقيتًا بعدد حصص مستقل، ثم طبّقه على الفصول أو على الجدول كاملًا.</p></div><button class="ghost-btn" id="addProfileBtn">+ نظام توقيت</button></div>
+            <div class="timing-activation">
+              <label>نظام التوقيت المطلوب<select id="activeProfileSelect"></select></label>
+              <label>نطاق التطبيق<select id="timingApplyScope"><option value="week">الأسبوع الكامل</option><option value="days">أيام محددة</option><option value="classes">فصول محددة</option></select></label>
+              <div class="timing-apply-days" id="timingApplyDays" hidden></div>
+              <button class="primary-btn" id="applyActiveProfileBtn">تطبيق وإعادة حساب الأنصبة</button>
+            </div>
+            <div class="timing-layout"><div class="profile-list" id="profileList"></div><div class="profile-editor" id="profileEditor"></div></div>
+          </article>
+          <article class="panel form-panel break-markers-panel">
+            <div class="panel-head"><div><h2>فواصل الفسح والصلاة في الجدول المجمّع</h2><p>تظهر كفواصل ملوّنة بطول الجدول، ويمكن تعديل أوقاتها ومسمياتها.</p></div></div>
+            <div id="breakMarkersEditor" class="break-markers-editor"></div>
+          </article>
+          <article class="panel form-panel footer-settings-panel">
+            <div class="panel-head"><div><h2>أسماء ومسميات تذييل الجداول</h2><p>أضف ما تحتاجه واختر الجنس لتظهر الصياغة المناسبة في الطباعة.</p></div><button class="ghost-btn" id="addFooterItemBtn">+ إضافة اسم ومسمى</button></div>
+            <div id="footerItemsEditor" class="footer-items-editor"></div>
+          </article>
+          <article class="panel form-panel accounts-panel" id="accountsPanel">
+            <div class="panel-head"><div><h2>المدراء والصلاحيات</h2><p>أضف مديرًا كامل الصلاحيات أو حسابًا مقيدًا بقسم واحد للغياب والاستئذان والتبديلات.</p></div><span class="secure-badge">دخول آمن</span></div>
+            <div class="account-note"><strong>طريقة الدخول</strong><span>أضف البريد المرتبط بحساب المستخدم، ثم شارك معه رابط الموقع بالبريد نفسه. لا تُحفظ كلمات مرور داخل البرنامج.</span></div>
+            <form id="accountForm" class="account-form">
+              <label>اسم المستخدم<input id="accountUsername" required placeholder="مثال: arabic.department"></label>
+              <label>الاسم الظاهر<input id="accountDisplayName" required placeholder="اسم المسؤول"></label>
+              <label>البريد الإلكتروني<input id="accountEmail" type="email" required placeholder="name@example.com" dir="ltr"></label>
+              <label>نوع الصلاحية<select id="accountRole"><option value="department">قسم محدد — تبديلات وأذونات</option><option value="full">مدير كامل الصلاحيات</option></select></label>
+              <label id="accountDepartmentLabel">القسم<select id="accountDepartment"></select></label>
+              <button class="primary-btn" type="submit">إضافة الحساب</button>
+            </form>
+            <div id="accountsList" class="accounts-list"><div class="empty-note">جارٍ تحميل الحسابات…</div></div>
+          </article>
+          <article class="panel danger-panel">
+            <div><h2>إدارة المشروع</h2><p>استورد نسخة احتياطية أو ابدأ مشروعًا فارغًا. لن تُمسح البيانات دون تأكيد.</p></div>
+            <div><label class="ghost-btn file-label">استيراد نسخة JSON<input id="backupInput" type="file" accept="application/json,.json"></label><button class="danger-btn" id="resetBtn">بدء مشروع فارغ</button></div>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <dialog id="entityDialog" class="dialog">
+    <form method="dialog" id="entityForm">
+      <div class="dialog-head"><div><p class="eyebrow" id="dialogEyebrow">إضافة</p><h2 id="dialogTitle">عنصر جديد</h2></div><button type="button" data-close-entity class="icon-btn" aria-label="إغلاق">×</button></div>
+      <div class="dialog-body" id="dialogFields"></div>
+      <div class="dialog-actions"><button type="button" data-close-entity class="ghost-btn">إلغاء</button><button type="submit" value="default" class="primary-btn" id="dialogSaveBtn">حفظ</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" class="dialog small-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">تأكيد الإجراء</p><h2 id="confirmTitle">هل أنت متأكد؟</h2></div></div>
+      <div class="dialog-body"><p id="confirmText"></p></div>
+      <div class="dialog-actions"><button value="cancel" class="ghost-btn">إلغاء</button><button value="confirm" class="danger-btn">تأكيد</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="excelImportDialog" class="dialog excel-import-dialog">
+    <form method="dialog">
+      <div class="dialog-head">
+        <div><p class="eyebrow">بناء جدول من الصفر</p><h2>استيراد البيانات الأساسية من Excel</h2></div>
+        <button value="cancel" class="icon-btn" aria-label="إغلاق">×</button>
+      </div>
+      <div class="dialog-body single-column">
+        <div class="excel-flow">
+          <span class="active"><b>1</b> اختيار الملف</span>
+          <span><b>2</b> الفحص والمعاينة</span>
+          <span><b>3</b> الاعتماد والإنشاء</span>
+        </div>
+        <label class="excel-drop" id="excelDropZone">
+          <input id="excelFileInput" type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12">
+          <span class="excel-file-mark">X</span>
+          <strong>اختر ملف Excel المعتمد</strong>
+          <small>يدعم ملفات .xlsx و.xlsm المبنية على النموذج المعتمد</small>
+          <em id="excelFileName">لم يتم اختيار ملف بعد</em>
+        </label>
+        <div class="excel-template-note">
+          <div><strong>ليس لديك النموذج؟</strong><small>حمِّل نسخة معبّأة بجميع بيانات الجدول الحالية وعدّلها مباشرةً.</small></div>
+          <a class="ghost-btn" href="assets/نموذج-البيانات-الأساسية-المعتمد.xlsx" download>تنزيل النموذج المعتمد</a>
+        </div>
+        <fieldset class="import-mode">
+          <legend>طريقة الاعتماد</legend>
+          <label><input type="radio" name="excelImportMode" value="replace" checked><span><b>استبدال البيانات وبناء الجدول من جديد</b><small>يحفظ نسخة مؤرشفة من الوضع الحالي أولًا، وهو الخيار الموصى به.</small></span></label>
+          <label><input type="radio" name="excelImportMode" value="merge"><span><b>دمج البيانات مع المشروع الحالي</b><small>يحدّث السجلات المطابقة ويضيف السجلات الجديدة، ثم يعيد إنشاء الجدول.</small></span></label>
+        </fieldset>
+        <div id="excelImportPreview" class="excel-import-preview">
+          <div class="empty-state compact-empty"><div>⌕</div><h3>اختر الملف لبدء الفحص</h3><p>لن تتغير أي بيانات قبل عرض النتيجة واعتمادها.</p></div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button value="cancel" class="ghost-btn">إلغاء</button>
+        <button type="button" class="ghost-btn accent-btn" id="inspectExcelBtn" disabled>فحص الملف ومعاينته</button>
+        <button type="button" class="primary-btn" id="applyExcelImportBtn" disabled>اعتماد وإنشاء الجدول</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="generatorDialog" class="dialog generator-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">المولّد الذكي</p><h2>إنشاء جدول متوازن</h2></div><button value="cancel" class="icon-btn" aria-label="إغلاق">×</button></div>
+      <div class="dialog-body">
+        <div class="generate-visual"><div class="pulse-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div><strong id="generatorStatus">جارٍ تجهيز القيود…</strong><p id="generatorDetail">نراجع التكليفات وأوقات عدم التوافر.</p></div></div>
+        <div class="progress-track"><span id="generatorProgress"></span></div>
+        <div class="generator-result" id="generatorResult" hidden></div>
+      </div>
+      <div class="dialog-actions"><button value="cancel" class="ghost-btn">إغلاق</button><button type="button" class="primary-btn" id="applyGeneratedBtn" hidden>اعتماد الجدول</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="swapDialog" class="dialog wide-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">منع التعارض مفعّل</p><h2>مقترح التبديل الذكي</h2></div><button value="cancel" class="icon-btn" aria-label="إغلاق">×</button></div>
+      <div class="dialog-body single-column">
+        <div class="swap-source-grid"><label>المعلّم<select id="swapTeacher"></select></label><label>اليوم<select id="swapDay"></select></label><label>الحصة<select id="swapPeriod"></select></label><button type="button" class="primary-btn" id="loadSwapSuggestionsBtn">إظهار المقترحات</button></div>
+        <fieldset class="swap-scope" id="swapScope"><legend>نطاق التبديل</legend><label><input type="radio" name="swapScope" value="auto" checked><span><b>اليوم نفسه ثم الأيام الأخرى</b><small>يبدأ بالأقرب، ثم يبحث في بقية الأسبوع تلقائيًا</small></span></label><label><input type="radio" name="swapScope" value="same"><span><b>في اليوم نفسه فقط</b><small>البحث داخل حصص اليوم المختار</small></span></label><label><input type="radio" name="swapScope" value="other"><span><b>في يوم آخر فقط</b><small>البحث في بقية أيام الأسبوع</small></span></label></fieldset>
+        <div id="swapSuggestions" class="swap-suggestions"></div>
+      </div>
+      <div class="dialog-actions"><button value="cancel" class="ghost-btn">إغلاق</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="changeReportDialog" class="dialog wide-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><p class="eyebrow">سجل التحريك</p><h2 id="changeReportDialogTitle">تفاصيل التغيير</h2></div><button value="cancel" class="icon-btn" aria-label="إغلاق">×</button></div>
+      <div class="dialog-body single-column"><div id="changeReportDialogBody" class="change-report-dialog-body"></div></div>
+      <div class="dialog-actions"><button type="button" class="ghost-btn" id="printChangeDialogBtn">طباعة التقرير</button><button value="cancel" class="primary-btn">إغلاق</button></div>
+    </form>
+  </dialog>
+
+  <div id="printArea" class="print-area"></div>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="imported-data.js"></script>
+  <script src="bootstrap.js"></script>
+</body>
+</html>
